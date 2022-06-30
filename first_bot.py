@@ -14,24 +14,6 @@ client = commands.Bot(command_prefix = '-')
 async def on_ready():
     print('Basic discord bot is ready to use')
 
-@client.command()
-async def clear(ctx, amount = 5):
-    await ctx.channel.purge(limit = amount)
-
-# This checks to see if a specfic message is sent
-@client.event
-async def on_message(message):
-    discord_username = str(message.author).split("#")[0]
-    channel_name = str(message.channel.name)
-
-    if message.author == client.user:
-        return
-
-    # If hi or hello are said in the welcome chat return hi along with their username
-    # Sends a basic message back to users
-    if 'hi' in message.content or 'hello' in message.content:
-        await message.channel.send(f'Hi , {discord_username}, hope you are having a great day!')
-
 # This command gives the clients current ping, to use this command just call -msping
 @client.command()
 async def msping(ctx):
@@ -40,7 +22,7 @@ async def msping(ctx):
 # This command gives the user heads or tails, to use this command just call -flipcoin
 @client.command()
 async def flipcoin(ctx):
-    choices = ['Heads', 'Tails']
+    choices = ['heads', 'tails']
     await ctx.send(f'It is {random.choice(choices)}')
 
 # This command looks through a csv file with over 20000 jokes and randomly chooses one
@@ -49,13 +31,26 @@ async def telljoke(ctx):
     jokes_filename = 'shortjokes.csv'
     filtered_jokes = pandas.read_csv(jokes_filename, usecols=['Joke'])
     jokes_array = numpy.array(filtered_jokes)
-    await ctx.send(f'{random.choice(jokes_array)}')
+    await ctx.send(f'Here is the joke: {random.choice(jokes_array)}')
 
+# This command clears just the last message
 @client.command()
-async def message(ctx, user:discord.member, *, message = None):
-    message = "welcome"
-    embed = discord.Embed(title = message)
-    await user.send(embed = embed)
+async def clear1(ctx, amount = 1):
+	await ctx.message.delete()
+	await ctx.channel.purge(limit = amount)
+
+# This command clears the last 10 messages in a channel
+@client.command()
+async def clear10(ctx, amount = 10):
+	await ctx.message.delete()
+	await ctx.channel.purge(limit = amount)
+
+# This command clears the last 10000 messages in a channel
+@client.command()
+async def clearall(ctx, amount = 100):
+    for i in range (0, 100):
+        await ctx.message.delete()
+        await ctx.channel.purge(limit = amount)
 
 # Each bot has their unique token so I have placed mine in an .env file
 client.run(os.getenv('TOKEN'))
